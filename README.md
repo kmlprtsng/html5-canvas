@@ -16,3 +16,8 @@ Resizing Canvas
 ## Episode 2. Drawing on the Canvas
 Canvas object
 Rectangle, line, arcs, bezier curves, images, text.
+
+## Episode 3. Animating the Canvas
+
+
+## Episode 4. Iteractive with the canvas
