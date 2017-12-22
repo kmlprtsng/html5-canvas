@@ -38,42 +38,67 @@ var c = canvas.getContext("2d");
 //   c.stroke(); //creates the border
 // }
 
-// function getRandomColor() {
-//   var letters = "0123456789ABCDEF";
-//   var color = "#";
-//   for (var i = 0; i < 6; i++) {
-//     color += letters[Math.floor(Math.random() * 16)];
-//   }
-//   return color;
-// }
+function getRandomColor() {
+  var letters = "0123456789ABCDEF";
+  var color = "#";
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
 
-//random gives us a number between 0 and 1
-var x = Math.random() * canvas.width, //random starting x value within the canvas
-  dx = (Math.random() < 0.5 ? -1 : 1) * 8, //x velocity (speed) is 1 if the value is 1 i.e. 1 pixel per frame e.g. x++
-  y = Math.random() * canvas.height, //y velocity (speed) is 1 if the value is 1 i.e. 1 pixel per frame e.g. y++
-  dy = (Math.random() < 0.5 ? -1 : 1) * 8,
-  circleRadius = 30;
+function Circle(x, y, dx, dy, radius, strokeColor) {
+  this.x = x;
+  this.y = y;
+  this.dx = dx;
+  this.dy = dy;
+  this.radius = radius;
+  this.strokeColor = strokeColor;
+
+  this.draw = function() {
+    c.beginPath();
+    c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+    c.strokeStyle = this.strokeColor;
+    c.stroke();
+  };
+
+  this.update = function() {
+    if (this.x + this.radius > canvas.width || this.x - this.radius < 0) {
+      this.dx = -this.dx;
+    }
+
+    if (this.y + this.radius > canvas.height || this.y - this.radius < 0) {
+      this.dy = -this.dy;
+    }
+
+    this.x += this.dx;
+    this.y += this.dy;
+
+    this.draw();
+  };
+}
+
+var circlesArray = [];
+
+for (var i = 0; i < 50; i++) {
+  //random gives us a number between 0 and 1
+  var radius = 30,
+    x = Math.random() * (canvas.width - radius * 2) + radius, //random starting x value within the canvas
+    dx = Math.random() * 3, //x velocity (speed) is 1 if the value is 1 i.e. 1 pixel per frame e.g. x++
+    y = Math.random() * (canvas.height - radius * 2) + radius, //y velocity (speed) is 1 if the value is 1 i.e. 1 pixel per frame e.g. y++
+    dy = Math.random() * 3;
+
+  circlesArray.push(new Circle(x, y, dx, dy, radius, getRandomColor()));
+}
 
 function animate() {
   requestAnimationFrame(animate); //create a loop, recursive
 
   c.clearRect(0, 0, canvas.width, canvas.height); //clear the whole canvas
 
-  c.beginPath();
-  c.arc(x, y, circleRadius, 0, Math.PI * 2, false);
-  c.strokeStyle = "pink";
-  c.stroke();
-
-  if (x + circleRadius > canvas.width || x - circleRadius < 0) {
-    dx = -dx;
+  for (var i = 0; i < circlesArray.length; i++) {
+    circlesArray[i].update();
   }
-
-  if (y + circleRadius > canvas.height || y - circleRadius < 0) {
-    dy = -dy;
-  }
-
-  x += dx;
-  y += dy;
 }
 
 animate();
