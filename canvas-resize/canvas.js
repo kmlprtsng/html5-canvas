@@ -1,6 +1,13 @@
 var canvas = document.querySelector("canvas");
-canvas.width = window.innerWidth - 10;
-canvas.height = window.innerHeight - 10;
+
+function adjustCanvasDimensions() {
+  canvas.width = window.innerWidth - 10;
+  canvas.height = window.innerHeight - 10;
+}
+
+adjustCanvasDimensions();
+
+//use Kuler for picking colors: https://color.adobe.com/explore/?filter=most-popular&time=month
 
 //fill with fill the inside of the object with a color
 
@@ -37,6 +44,24 @@ var c = canvas.getContext("2d");
 //   c.arc(x, y, 30, 0, Math.PI * 2, false);
 //   c.stroke(); //creates the border
 // }
+var mouse = {
+    x: undefined,
+    y: undefined
+  },
+  maxRadius = 40,
+  minRadius = 2,
+  catchmentArea = 50;
+
+window.addEventListener("mousemove", function(event) {
+  mouse.x = event.x;
+  mouse.y = event.y;
+  //console.log(mouse);
+});
+
+window.addEventListener("resize", function() {
+  adjustCanvasDimensions();
+  init();
+});
 
 function getRandomColor() {
   var letters = "0123456789ABCDEF";
@@ -52,14 +77,18 @@ function Circle(x, y, dx, dy, radius, strokeColor) {
   this.y = y;
   this.dx = dx;
   this.dy = dy;
+  this.minRadius = radius;
   this.radius = radius;
   this.strokeColor = strokeColor;
+  this.fillColor = getRandomColor();
 
   this.draw = function() {
     c.beginPath();
     c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-    c.strokeStyle = this.strokeColor;
-    c.stroke();
+    //c.strokeStyle = this.strokeColor;
+    //c.stroke();
+    c.fillStyle = this.fillColor;
+    c.fill();
   };
 
   this.update = function() {
@@ -74,21 +103,38 @@ function Circle(x, y, dx, dy, radius, strokeColor) {
     this.x += this.dx;
     this.y += this.dy;
 
+    if (
+      mouse.x - this.x < catchmentArea &&
+      mouse.x - this.x > -catchmentArea &&
+      mouse.y - this.y < catchmentArea &&
+      mouse.y - this.y > -catchmentArea
+    ) {
+      if (this.radius < maxRadius) {
+        this.radius += 4;
+      }
+    } else if (this.radius > this.minRadius) {
+      this.radius--;
+    }
+
     this.draw();
   };
 }
 
 var circlesArray = [];
 
-for (var i = 0; i < 50; i++) {
-  //random gives us a number between 0 and 1
-  var radius = 30,
-    x = Math.random() * (canvas.width - radius * 2) + radius, //random starting x value within the canvas
-    dx = Math.random() * 3, //x velocity (speed) is 1 if the value is 1 i.e. 1 pixel per frame e.g. x++
-    y = Math.random() * (canvas.height - radius * 2) + radius, //y velocity (speed) is 1 if the value is 1 i.e. 1 pixel per frame e.g. y++
-    dy = Math.random() * 3;
+function init() {
+  circlesArray = [];
 
-  circlesArray.push(new Circle(x, y, dx, dy, radius, getRandomColor()));
+  for (var i = 0; i < 600; i++) {
+    //random gives us a number between 0 and 1
+    var radius = Math.random() * 3 + 1,
+      x = Math.random() * (canvas.width - radius * 2) + radius, //random starting x value within the canvas
+      dx = Math.random() * 3, //x velocity (speed) is 1 if the value is 1 i.e. 1 pixel per frame e.g. x++
+      y = Math.random() * (canvas.height - radius * 2) + radius, //y velocity (speed) is 1 if the value is 1 i.e. 1 pixel per frame e.g. y++
+      dy = Math.random() * 3;
+
+    circlesArray.push(new Circle(x, y, dx, dy, radius, getRandomColor()));
+  }
 }
 
 function animate() {
@@ -101,4 +147,5 @@ function animate() {
   }
 }
 
+init();
 animate();
