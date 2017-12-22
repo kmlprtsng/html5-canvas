@@ -27,10 +27,10 @@ var c = canvas.getContext("2d");
 // c.arc(300, 300, 30, 0, Math.PI * 2, false);
 // c.stroke(); //creates the border
 // c.fill();
-
 // for (var i = 0; i < 100; i++) {
-//   var x = Math.random() * window.innerWidth;
-//   var y = Math.random() * window.innerHeight;
+
+//   var x = Math.random() * canvas.width;
+//   var y = Math.random() * canvas.height;
 
 //   c.beginPath(); //break away from the previously designed line
 //   c.strokeStyle = getRandomColor();
@@ -47,9 +47,12 @@ var c = canvas.getContext("2d");
 //   return color;
 // }
 
-var x = 200;
-var dx = 10; //x velocity is 1. 1 pixel per frame e.g. x++
-var circleRadius = 30;
+//random gives us a number between 0 and 1
+var x = Math.random() * canvas.width, //random starting x value within the canvas
+  dx = (Math.random() < 0.5 ? -1 : 1) * 8, //x velocity (speed) is 1 if the value is 1 i.e. 1 pixel per frame e.g. x++
+  y = Math.random() * canvas.height, //y velocity (speed) is 1 if the value is 1 i.e. 1 pixel per frame e.g. y++
+  dy = (Math.random() < 0.5 ? -1 : 1) * 8,
+  circleRadius = 30;
 
 function animate() {
   requestAnimationFrame(animate); //create a loop, recursive
@@ -57,7 +60,7 @@ function animate() {
   c.clearRect(0, 0, canvas.width, canvas.height); //clear the whole canvas
 
   c.beginPath();
-  c.arc(x, 200, circleRadius, 0, Math.PI * 2, false);
+  c.arc(x, y, circleRadius, 0, Math.PI * 2, false);
   c.strokeStyle = "pink";
   c.stroke();
 
@@ -65,7 +68,12 @@ function animate() {
     dx = -dx;
   }
 
+  if (y + circleRadius > canvas.height || y - circleRadius < 0) {
+    dy = -dy;
+  }
+
   x += dx;
+  y += dy;
 }
 
 animate();
